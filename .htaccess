@@ -1,0 +1,56 @@
+Options -Indexes
+Options +FollowSymLinks
+
+# ============================================================
+#  TechStore - Configuración Apache / Rewrite Rules
+# ============================================================
+
+# Habilitar mod_rewrite
+RewriteEngine On
+
+# ---- Seguridad: Bloquear acceso a archivos sensibles ----
+<FilesMatch "\.(sql|log|env|json|md|git)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Proteger directorios sensibles
+RedirectMatch 403 ^/config/.*$
+RedirectMatch 403 ^/models/.*\.php$
+RedirectMatch 403 ^/logs/.*$
+
+# ---- HTTPS redirect (descomentar en producción) ----
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ---- No reescribir archivos/carpetas reales ----
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# ---- Reescribir todo al index.php (Front Controller) ----
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# ---- Cabeceras de seguridad ----
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ---- Compresión GZIP ----
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain text/css application/json
+    AddOutputFilterByType DEFLATE application/javascript text/xml text/html
+</IfModule>
+
+# ---- Cache de recursos estáticos ----
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg  "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png  "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType text/css   "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+</IfModule>

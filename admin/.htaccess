@@ -1,0 +1,11 @@
+Options -Indexes
+Options +FollowSymLinks
+
+RewriteEngine On
+
+# No reescribir archivos/carpetas reales
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Todo al index.php del admin
+RewriteRule ^(.*)$ index.php [QSA,L]
