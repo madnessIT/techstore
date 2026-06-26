@@ -1,0 +1,56 @@
+services:
+  web:
+    build: .
+    container_name: techstore_web
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      - ENTORNO=desarrollo
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=techstore
+      - DB_USER=root
+      - DB_PASS=secret_techstore
+      - BASE_URL=http://localhost:8080
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: techstore_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: techstore
+      MYSQL_ROOT_PASSWORD: secret_techstore
+    ports:
+      - "13306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql/techstore.sql:/docker-entrypoint-initdb.d/01_techstore.sql:ro
+      - ./sql/migracion_iva_envio.sql:/docker-entrypoint-initdb.d/02_migracion_iva_envio.sql:ro
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psecret_techstore"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: techstore_phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
