@@ -15,6 +15,7 @@
     <!-- Custom CSS -->
     <link href="<?= BASE_URL ?>/assets/css/techstore.css" rel="stylesheet">
     
+    <meta name="base-url" content="<?= BASE_URL ?>">
     <?php if (isset($extraHead)) echo $extraHead; ?>
 </head>
 <body>

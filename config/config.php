@@ -23,7 +23,11 @@ define('DB_CHARSET', getenv('DB_CHARSET') ?: 'utf8mb4');
 // ============================================================
 // URL BASE (sin barra final)
 // ============================================================
-define('BASE_URL', getenv('BASE_URL') ?: 'http://localhost/techstore');
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$scriptPath = dirname($_SERVER['SCRIPT_NAME'] ?? '');
+$scriptPath = ($scriptPath === '\\' || $scriptPath === '/') ? '' : $scriptPath;
+define('BASE_URL', getenv('BASE_URL') ?: $protocol . $host . $scriptPath);
 define('BASE_PATH', dirname(__DIR__)); // Ruta absoluta al proyecto
 
 // ============================================================

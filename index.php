@@ -37,6 +37,9 @@ if (!isset($_SESSION['created'])) {
 // ============================================================
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $script = dirname($_SERVER['SCRIPT_NAME']);
+if ($script === '/' || $script === '\\') {
+    $script = '';
+}
 $ruta   = '/' . trim(str_replace($script, '', $uri), '/');
 $partes = array_values(array_filter(explode('/', trim($ruta, '/'))));
 
